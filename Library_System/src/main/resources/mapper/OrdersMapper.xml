@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.demo.mapper.OrdersMapper">
+
+    <resultMap id="historyMap" type="orders">
+        <result column="userId" property="userId"></result>
+        <result column="isbn" property="isbn"></result>
+        <result column="borrowTime" property="borrowTime"></result>
+        <result column="returnTime" property="returnTime"></result>
+        <result column="dueTime" property="dueTime"></result>
+        <result column="expireStatus" property="expireStatus"></result>
+        <association property="user" javaType="user">
+            <result column="username" property="username"></result>
+        </association>
+        <association property="book" javaType="book">
+            <result column="bookname" property="bookname"></result>
+        </association>
+    </resultMap>
+    <select id="listHistory" resultMap="historyMap">
+        SELECT
+            o.user_id     userId,
+            o.isbn        isbn,
+            o.borrow_time borrowTime,
+            o.return_time returnTime,
+            o.due_time    dueTime,
+            o.expireStatus expireStatus,
+            b.bookname    bookname,
+            u.username    username
+        FROM orders o,book b,sys_user u
+        <where>
+            o.user_id=u.id AND o.isbn=b.isbn
+            <if test="startTime!=null and startTime!=''">
+                AND o.borrow_time>=#{startTime}
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                AND o.borrow_time <![CDATA[<=]]> #{endTime}
+            </if>
+            <if test="userId!=null">
+                AND o.user_id=#{userId}
+            </if>
+            <if test="isbn!=null">
+                AND o.isbn=#{isbn}
+            </if>
+        </where>
+        ORDER BY o.expireStatus DESC, o.borrow_time ASC
+    </select>
+
+    <update id="modifyUserByOrder">
+        update sys_user
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="status=case" suffix="end,">
+               <foreach collection="list" item="item" index="index">
+                  when id=#{item.userId} then #{status}
+               </foreach>
+            </trim>
+        </trim>
+        WHERE id in
+        <foreach collection="list" item="item" separator="," open="(" close=")" index="index">
+            #{item.userId}
+        </foreach>
+    </update>
+
+    <update id="modifyUserStatus">
+        update sys_user set status=#{status}
+        WHERE id in
+        <foreach collection="ids" item="item" separator="," open="(" close=")" index="index">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="modifyOneUser">
+        update sys_user SET status=#{status} WHERE username=#{username}
+    </update>
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.demo.mapper.BookMapper">
+
+     <resultMap id="rentMapper" type="orders">
+          <result property="isbn" column="isbn"></result>
+          <result property="borrowTime" column="borrowTime"></result>
+          <result property="dueTime" column="dueTime"></result>
+          <result property="expireStatus" column="expireStatus"></result>
+          <association property="user" javaType="user">
+               <id property="id" column="userId"></id>
+               <result property="username" column="username"></result>
+               <result property="phone" column="phone"></result>
+          </association>
+     </resultMap>
+     <select id="queryRent" resultMap="rentMapper" parameterType="book">
+          select
+             u.id   as  userId,
+             u.username as username,
+             u.phone as phone,
+             o.isbn as isbn,
+             o.borrow_time as borrowTime,
+             o.due_time as dueTime,
+             o.expireStatus as expireStatus
+           from sys_user u,orders o
+           where o.isbn in
+          <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+              #{item.isbn}
+          </foreach>
+           and o.expireStatus=2 and u.id=o.user_id
+     </select>
+</mapper>

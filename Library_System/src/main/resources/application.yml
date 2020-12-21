@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://39.100.119.221:3306/library?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    type: com.alibaba.druid.pool.DruidDataSource
+  redis:
+    jedis:
+      pool:
+        max-active: 50
+        min-idle: 0
+        max-wait: -1
+    host: 39.100.119.221
+    port: 6379
+    database: 0
+    timeout: 12000
+
+
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:/mapper/**Mapper.xml
+  type-aliases-package: com.library.demo.entity
+
+jwt:
+  expireTime: 7200000
+  refreshExpiretime: 14400000
+  encrypt: U0JBUElOENhspJrzkyNjQ1NA
+
+logging:
+  level:
+    com.library.demo.mapper: debug
+    com.library.demo.service: debug
+server:
+  port: 8084

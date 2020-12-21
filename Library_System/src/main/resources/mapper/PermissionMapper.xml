@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.demo.mapper.PermissionMapper">
+
+    <resultMap id="permissionMap" type="user">
+        <id column="userId" property="id"></id>
+        <result column="nickname" property="nickname"></result>
+        <association property="role" javaType="role">
+            <id column="roleId" property="id"></id>
+            <result column="roleName" property="roleName"></result>
+            <collection property="permissionList" ofType="permission">
+                <result column="menuCode" property="menuCode"></result>
+                <result column="menuName" property="menuName"></result>
+                <result column="permissionCode" property="permissionCode"></result>
+                <result column="permissionName" property="permissionName"></result>
+                <result column="requiredPermission" property="requiredPermission"></result>
+            </collection>
+        </association>
+    </resultMap>
+    <select id="getPermission"  resultMap="permissionMap">
+        SELECT
+            u.id  as  userId,
+            u.nickname as nickname,
+            r.id   as roleId,
+            r.role_name as roleName,
+            p.menu_code  as    menuCode,
+            p.menu_name  as    menuName,
+            p.permission_code as permissionCode,
+            p.permission_name as permissionName,
+            p.required_permission as requiredPermission
+        FROM sys_user u
+                LEFT JOIN  sys_role r ON u.role_id=r.id
+                LEFT JOIN  sys_role_permission rs ON r.id=rs.role_id
+                LEFT JOIN  sys_permission p ON rs.permission_id=p.id
+        WHERE username=#{username}
+    </select>
+
+
+</mapper>
